@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import { Plus, Users, ChevronRight } from "lucide-react";
+import GroupFormDialog from "@/components/forms/GroupFormDialog";
 
 const mockGroups = [
   { name: "employees", description: "Full-time employees", members: 8420, priority: 1, checkAttrs: 3, replyAttrs: 5, status: "Active" },
@@ -23,17 +25,24 @@ const columns: Column<typeof mockGroups[0]>[] = [
   { key: "actions", label: "", render: () => <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><ChevronRight className="h-4 w-4" /></Button> },
 ];
 
-const GroupsPage = () => (
-  <div>
-    <div className="page-header">
-      <div>
-        <h1 className="page-title">Groups</h1>
-        <p className="page-description">Manage RADIUS groups (radusergroup), check/reply attributes, and membership</p>
+const GroupsPage = () => {
+  const [createDialog, setCreateDialog] = useState(false);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Groups</h1>
+          <p className="page-description">Manage RADIUS groups (radusergroup), check/reply attributes, and membership</p>
+        </div>
+        <Button size="sm" className="gap-1.5" onClick={() => setCreateDialog(true)}>
+          <Plus className="h-3.5 w-3.5" /> Create Group
+        </Button>
       </div>
-      <Button size="sm" className="gap-1.5"><Plus className="h-3.5 w-3.5" /> Create Group</Button>
+      <DataTable columns={columns} data={mockGroups} searchPlaceholder="Search groups..." />
+      <GroupFormDialog open={createDialog} onOpenChange={setCreateDialog} />
     </div>
-    <DataTable columns={columns} data={mockGroups} searchPlaceholder="Search groups..." />
-  </div>
-);
+  );
+};
 
 export default GroupsPage;

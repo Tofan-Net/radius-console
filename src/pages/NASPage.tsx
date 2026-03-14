@@ -1,7 +1,9 @@
+import { useState } from "react";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Plus, Server } from "lucide-react";
+import NASFormDialog from "@/components/forms/NASFormDialog";
 
 const mockNas = [
   { id: 1, nasname: "10.0.0.1", shortname: "core-sw-01", type: "Cisco", secret: "•••••••••", ports: 48, description: "Core Switch Building A", status: "online" as const, coa: true },
@@ -19,17 +21,24 @@ const columns: Column<typeof mockNas[0]>[] = [
   { key: "status", label: "Status", render: (r) => <StatusBadge status={r.status} label={r.status === "online" ? "Online" : r.status === "warning" ? "Degraded" : "Unreachable"} /> },
 ];
 
-const NASPage = () => (
-  <div>
-    <div className="page-header">
-      <div>
-        <h1 className="page-title">NAS Devices</h1>
-        <p className="page-description">Network Access Servers registered for RADIUS authentication</p>
+const NASPage = () => {
+  const [createDialog, setCreateDialog] = useState(false);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">NAS Devices</h1>
+          <p className="page-description">Network Access Servers registered for RADIUS authentication</p>
+        </div>
+        <Button size="sm" className="gap-1.5" onClick={() => setCreateDialog(true)}>
+          <Plus className="h-3.5 w-3.5" /> Add NAS
+        </Button>
       </div>
-      <Button size="sm" className="gap-1.5"><Plus className="h-3.5 w-3.5" /> Add NAS</Button>
+      <DataTable columns={columns} data={mockNas} searchPlaceholder="Search by name, IP, or vendor..." />
+      <NASFormDialog open={createDialog} onOpenChange={setCreateDialog} />
     </div>
-    <DataTable columns={columns} data={mockNas} searchPlaceholder="Search by name, IP, or vendor..." />
-  </div>
-);
+  );
+};
 
 export default NASPage;

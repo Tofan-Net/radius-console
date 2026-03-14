@@ -12,6 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import UserFormDialog from "@/components/forms/UserFormDialog";
+import CSVImportDialog from "@/components/forms/CSVImportDialog";
 
 const mockUsers = Array.from({ length: 35 }, (_, i) => ({
   id: i + 1,
@@ -28,6 +30,10 @@ const mockUsers = Array.from({ length: 35 }, (_, i) => ({
 
 const UsersPage = () => {
   const [disableDialog, setDisableDialog] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [createDialog, setCreateDialog] = useState(false);
+  const [editDialog, setEditDialog] = useState(false);
+  const [csvDialog, setCsvDialog] = useState(false);
 
   const columns: Column<typeof mockUsers[0]>[] = [
     {
@@ -68,13 +74,13 @@ const UsersPage = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem><Eye className="h-3.5 w-3.5 mr-2" /> View Details</DropdownMenuItem>
-            <DropdownMenuItem><Edit className="h-3.5 w-3.5 mr-2" /> Edit User</DropdownMenuItem>
+            <DropdownMenuItem asChild><Link to={`/users/${row.id}`} className="flex items-center"><Eye className="h-3.5 w-3.5 mr-2" /> View Details</Link></DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setEditDialog(true)}><Edit className="h-3.5 w-3.5 mr-2" /> Edit User</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => setDisableDialog(true)}>
               <Lock className="h-3.5 w-3.5 mr-2" /> Disable User
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(true)}>
               <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -91,10 +97,10 @@ const UsersPage = () => {
           <p className="page-description">Manage RADIUS user accounts, credentials, and access policies</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setCsvDialog(true)}>
             <Upload className="h-3.5 w-3.5" /> CSV Import
           </Button>
-          <Button size="sm" className="gap-1.5">
+          <Button size="sm" className="gap-1.5" onClick={() => setCreateDialog(true)}>
             <UserPlus className="h-3.5 w-3.5" /> Add User
           </Button>
         </div>
@@ -113,6 +119,10 @@ const UsersPage = () => {
         }
       />
 
+      <UserFormDialog open={createDialog} onOpenChange={setCreateDialog} mode="create" />
+      <UserFormDialog open={editDialog} onOpenChange={setEditDialog} mode="edit" />
+      <CSVImportDialog open={csvDialog} onOpenChange={setCsvDialog} />
+
       <ConfirmDialog
         open={disableDialog}
         onOpenChange={setDisableDialog}
@@ -121,7 +131,17 @@ const UsersPage = () => {
         confirmLabel="Disable User"
         variant="destructive"
         requireReason
-        onConfirm={(reason) => { setDisableDialog(false); }}
+        onConfirm={() => setDisableDialog(false)}
+      />
+      <ConfirmDialog
+        open={deleteDialog}
+        onOpenChange={setDeleteDialog}
+        title="Delete User Account"
+        description="This will permanently delete the user and all associated radcheck, radreply, and radusergroup entries. This cannot be undone."
+        confirmLabel="Delete User"
+        variant="destructive"
+        requireReason
+        onConfirm={() => setDeleteDialog(false)}
       />
     </div>
   );

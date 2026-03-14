@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
-import { Plus, Building2, Globe, Key } from "lucide-react";
+import { Plus, Building2 } from "lucide-react";
+import TenantFormDialog from "@/components/forms/TenantFormDialog";
 
 const mockTenants = [
   { id: 1, name: "Acme Corporation", realm: "acme.com", users: 8420, sessions: 2100, status: "online" as const, mode: "SQL", callerIps: "10.0.0.0/8", apiToken: "tk_acme_•••" },
@@ -23,17 +25,24 @@ const columns: Column<typeof mockTenants[0]>[] = [
   { key: "status", label: "Status", render: (r) => <StatusBadge status={r.status} label={r.status === "online" ? "Active" : r.status === "warning" ? "Degraded" : "Suspended"} /> },
 ];
 
-const TenantsPage = () => (
-  <div>
-    <div className="page-header">
-      <div>
-        <h1 className="page-title">Tenants / Realms</h1>
-        <p className="page-description">Multi-tenant scoping with realm mapping, API tokens, and allowed caller IPs</p>
+const TenantsPage = () => {
+  const [createDialog, setCreateDialog] = useState(false);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Tenants / Realms</h1>
+          <p className="page-description">Multi-tenant scoping with realm mapping, API tokens, and allowed caller IPs</p>
+        </div>
+        <Button size="sm" className="gap-1.5" onClick={() => setCreateDialog(true)}>
+          <Plus className="h-3.5 w-3.5" /> Add Tenant
+        </Button>
       </div>
-      <Button size="sm" className="gap-1.5"><Plus className="h-3.5 w-3.5" /> Add Tenant</Button>
+      <DataTable columns={columns} data={mockTenants} searchPlaceholder="Search tenants by name or realm..." />
+      <TenantFormDialog open={createDialog} onOpenChange={setCreateDialog} />
     </div>
-    <DataTable columns={columns} data={mockTenants} searchPlaceholder="Search tenants by name or realm..." />
-  </div>
-);
+  );
+};
 
 export default TenantsPage;
