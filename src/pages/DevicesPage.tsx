@@ -1,7 +1,9 @@
+import { useState } from "react";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Plus, HardDrive } from "lucide-react";
+import DeviceFormDialog from "@/components/forms/DeviceFormDialog";
 
 const mockDevices = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
@@ -24,17 +26,24 @@ const columns: Column<typeof mockDevices[0]>[] = [
   { key: "status", label: "Status", render: (r) => <StatusBadge status={r.status} label={r.statusLabel} /> },
 ];
 
-const DevicesPage = () => (
-  <div>
-    <div className="page-header">
-      <div>
-        <h1 className="page-title">MAC Auth Devices</h1>
-        <p className="page-description">Manage MAC authentication bypass (MAB) device entries</p>
+const DevicesPage = () => {
+  const [createDialog, setCreateDialog] = useState(false);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">MAC Auth Devices</h1>
+          <p className="page-description">Manage MAC authentication bypass (MAB) device entries</p>
+        </div>
+        <Button size="sm" className="gap-1.5" onClick={() => setCreateDialog(true)}>
+          <Plus className="h-3.5 w-3.5" /> Add Device
+        </Button>
       </div>
-      <Button size="sm" className="gap-1.5"><Plus className="h-3.5 w-3.5" /> Add Device</Button>
+      <DataTable columns={columns} data={mockDevices} searchPlaceholder="Search by MAC, description, or group..." onExport={() => {}} />
+      <DeviceFormDialog open={createDialog} onOpenChange={setCreateDialog} />
     </div>
-    <DataTable columns={columns} data={mockDevices} searchPlaceholder="Search by MAC, description, or group..." onExport={() => {}} />
-  </div>
-);
+  );
+};
 
 export default DevicesPage;
